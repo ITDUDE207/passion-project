@@ -5,6 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-glow: #58a6ff;
+            --text-main: #c9d1d9;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .index-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #58a6ff, #bc8cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        /* The HTML Accordion Trick */
+        details {
+            background: var(--card-bg);
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Hover Glow Effect */
+        details:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+        }
+
+        summary {
+            padding: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none; /* Removes default arrow */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Custom animated indicator using pure CSS */
+        summary::after {
+            content: '➔';
+            transition: transform 0.3s ease;
+            color: var(--accent-glow);
+        }
+
+        details[open] summary::after {
+            transform: rotate(90deg);
+        }
+
+        /* Links List styling */
+        .links-list {
+            list-style: none;
+            padding: 0 1rem 1rem 1rem;
+            margin: 0;
+            border-top: 1px solid #30363d;
+        }
+
+        .links-list li {
+            padding: 0.75rem 0;
+        }
+
+        .links-list a {
+            color: #8b949e;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        /* Cooler Hover Underline Trick */
+        .links-list a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--accent-glow);
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+
+        .links-list a:hover {
+            color: #fff;
+        }
+
+        .links-list a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+      </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -38,7 +153,30 @@
         </div>
       </div>
     </nav>
-    <h1>Coding Page Index</h1>
+    
+       <main class="index-container">
+        <h1>// CORE_INDEX</h1>
+
+        <!-- Category 1 -->
+        <details open>
+            <summary>HTML</summary>
+            <ul class="links-list">
+                <li><a href="spinning.html">HTML5 Spinning Page</a></li>
+                <li><a href="css-variables.html">Dynamic CSS Themes</a></li>
+                <li><a href="js-async.html">Async/Await Deep Dive</a></li>
+            </ul>
+        </details>
+
+        <!-- Category 2 -->
+        <details>
+            <summary>Backend & Databases</summary>
+            <ul class="links-list">
+                <li><a href="node-setup.html">Node.js API Architecture</a></li>
+                <li><a href="sql-joins.html">Visualising SQL Joins</a></li>
+            </ul>
+        </details>
+    </main>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   </body>
 </html>
