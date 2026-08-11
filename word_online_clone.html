@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document1 - Microsoft Word Online</title>
+    <style>
+        :root {
+            --word-blue: #185abd;
+            --word-blue-dark: #124996;
+            --ribbon-bg: #f3f2f1;
+            --border-color: #dedede;
+            --text-dark: #323130;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #eaeaea;
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            color: var(--text-dark);
+            overflow: hidden;
+        }
+
+        /* 1. Main Title Bar */
+        .title-bar {
+            background-color: var(--word-blue);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            height: 40px;
+            font-size: 14px;
+        }
+        .title-bar .app-title {
+            font-weight: 600;
+        }
+        .title-bar .doc-search {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 4px;
+            padding: 4px 12px;
+            color: white;
+            width: 280px;
+            outline: none;
+            font-size: 12px;
+        }
+        .title-bar .doc-search::placeholder { color: #e1dfdd; }
+
+        /* 2. Menu Tabs Bar */
+        .menu-tabs {
+            background-color: var(--word-blue-dark);
+            display: flex;
+            padding-left: 20px;
+            height: 32px;
+        }
+        .tab {
+            color: white;
+            padding: 6px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            user-select: none;
+        }
+        .tab:hover { background-color: rgba(255,255,255,0.1); }
+        .tab.active {
+            background-color: var(--ribbon-bg);
+            color: var(--word-blue-dark);
+            font-weight: 600;
+            border-bottom: none;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        /* 3. Word Tool Ribbon */
+        .ribbon-container {
+            background-color: var(--ribbon-bg);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            min-height: 50px;
+        }
+        .ribbon-pane {
+            display: none;
+            padding: 6px 20px;
+            gap: 15px;
+            align-items: center;
+        }
+        .ribbon-pane.active {
+            display: flex;
+        }
+        .ribbon-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-right: 1px solid #d2d0ce;
+            padding-right: 15px;
+            height: 38px;
+            position: relative;
+        }
+        .ribbon-group:last-child { border-right: none; }
+        
+        /* Ribbon Actions */
+        button.ribbon-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #323130;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+        }
+        button.ribbon-btn:hover { background-color: #e1dfdd; }
+        button.ribbon-btn:active { background-color: #c8c6c4; }
+        
+        select.ribbon-select {
+            padding: 4px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: white;
+            font-size: 12px;
+            outline: none;
+        }
+
+        /* Table Dropdown Component */
+        .table-dropdown {
+            position: absolute;
+            top: 34px;
+            left: 0;
+            background: white;
+            border: 1px solid #adb5bd;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            padding: 10px;
+            display: none;
+            z-index: 200;
+            border-radius: 4px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 20px);
+            gap: 2px;
+            margin-bottom: 5px;
+        }
+        .grid-cell {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background: #fff;
+        }
+        .grid-cell.highlighted {
+            background-color: rgba(24, 90, 189, 0.4);
+            border-color: var(--word-blue);
+        }
+
+        /* 4. Canvas Viewport Wrapper */
+        .workspace {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* A4 Page Mimicry */
+        .editor-container {
+            background-color: #ffffff;
+            width: 812px;
+            min-height: 1048px;
+            padding: 96px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+            box-sizing: border-box;
+            outline: none;
+            font-family: "Calibri", Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #000000;
+        }
+
+        /* Styled table inserts inside the document */
+        .editor-container table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .editor-container th, .editor-container td {
+            border: 1px solid #adb5bd;
+            padding: 8px;
+            min-width: 50px;
+            text-align: left;
+        }
+
+        /* Styled Image Resizer */
+        .editor-container img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            display: block;
+        }
+
+        /* 5. Bottom Status Bar */
+        .status-bar {
+            background-color: var(--word-blue-dark);
+            color: white;
+            height: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 12px;
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Word Header Top Bar -->
+    <div class="title-bar">
+        <span class="app-title">Word</span>
+        <input type="text" class="doc-search" placeholder="Search (Alt+Q)">
+        <div style="font-size: 12px;">Document1 - Saved to Cloud</div>
+    </div>
+
+    <!-- 2. Dynamic Ribbon Switcher Tabs -->
+    <div class="menu-tabs">
+        <div class="tab" onclick="switchTab(event, 'tab-file')">File</div>
+        <div class="tab active" onclick="switchTab(event, 'tab-home')">Home</div>
+        <div class="tab" onclick="switchTab(event, 'tab-insert')">Insert</div>
+        <div class="tab" onclick="switchTab(event, 'tab-layout')">Layout</div>
+    </div>
+
+    <!-- 3. Dynamic Tool Ribbons -->
+    <div class="ribbon-container">
+        
+        <!-- FILE PANE -->
+        <div id="tab-file" class="ribbon-pane">
+            <div class="ribbon-group">
+                <button class="ribbon-btn" onclick="alert('Document successfully auto-saved!')" style="font-size:12px; font-weight:normal;">💾 Save Copy</button>
+                <button class="ribbon-btn" onclick="window.print()" style="font-size:12px; font-weight:normal;">🖨️ Print Layout</button>
+            </div>
+        </div>
+
+        <!-- HOME PANE -->
+        <div id="tab-home" class="ribbon-pane active">
+            <div class="ribbon-group">
+                <button class="ribbon-btn" onclick="format('undo')" title="Undo">↶</button>
+                <button class="ribbon-btn" onclick="format('redo')" title="Redo">↷</button>
+            </div>
+            <div class="ribbon-group">
+                <select class="ribbon-select" onchange="format('fontName', this.value)" style="width: 110px;">
+                    <option value="Calibri">Calibri</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Segoe UI">Segoe UI</option>
+                </select>
+                <select class="ribbon-select" onchange="format('fontSize', this.value)" style="width: 50px;">
+                    <option value="3">12</option>
+                    <option value="4" selected>14</option>
+                    <option value="5">18</option>
+                    <option value="6">24</option>
+                </select>
+            </div>
+            <div class="ribbon-group">
+                <button class="ribbon-btn" onclick="format('bold')" title="Bold">B</button>
+                <button class="ribbon-btn" onclick="format('italic')" title="Italic"><i>I</i></button>
+                <button class="ribbon-btn" onclick="format('underline')" title="Underline"><u>U</u></button>
+                <input type="color" onchange="format('foreColor', this.value)" title="Font Colour" style="width:24px; height:24px; border:none; cursor:pointer; padding:0; background:none;">
+            </div>
+            <div class="ribbon-group">
+                <button class="ribbon-btn" onclick="format('justifyLeft')">├─</button>
+                <button class="ribbon-btn" onclick="format('justifyCenter')">─┼─</button>
+                <button class="ribbon-btn" onclick="format('justifyRight')">─┤</button>
+            </div>
+        </div>
+
+        <!-- INSERT PANE -->
+        <div id="tab-insert" class="ribbon-pane">
+            <div class="ribbon-group">
+                <button class="ribbon-btn" onclick="toggleTableDropdown(event)" style="font-size: 13px; font-weight: normal; display: flex; gap: 4px;">
+                    📅 Table ▾
+                </button>
+                <div class="table-dropdown" id="tableMenu">
+                    <div style="font-size:11px; margin-bottom:5px; color:#666;" id="gridLabel">Insert Table</div>
+                    <div class="grid-container" onmouseleave="clearGridHighlight()"></div>
+                </div>
+            </div>
+
+            <div class="ribbon-group">
+                <button class="ribbon-btn" onclick="document.getElementById('imageLoader').click()" style="font-size: 13px; font-weight: normal; display: flex; gap: 4px;">
+                    🖼️ Pictures
+                </button>
+                <input type="file" id="imageLoader" accept="image/*" style="display:none;" onchange="insertImage(event)">
+            </div>
+            
+            <div class="ribbon-group">
+                <button class="ribbon-btn" onclick="format('insertHorizontalRule')" style="font-size: 13px; font-weight: normal;">➖ Divider Line</button>
+            </div>
+        </div>
+
+        <div id="tab-layout" class="ribbon-pane">
+            <div class="ribbon-group">
+                <select class="ribbon-select" onchange="changeMargin(this.value)">
+                    <option value="96px">Margins: Normal (1 inch)</option>
+                    <option value="48px">Margins: Narrow (0.5 inch)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="editor-container" contenteditable="true" id="editor" oninput="updateWordCount()">
+            <p style="font-size: 24px; margin-top: 0; font-weight: bold; color: #2b579a;">Project Proposals</p>
+            <p>Click on the <b>Insert tab</b> in the ribbon header above to seamlessly add clean tables or display system images inside this document canvas layout instantly.</p>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div>Page 1 of 1</div>
+        <div id="wordCount">24 words</div>
+        <div>English (United Kingdom)</div>
+    </div>
+
+    <script>
+        function format(command, value = null) {
+            document.execCommand(command, false, value);
+            document.getElementById('editor').focus();
+            updateWordCount();
+        }
+
+        function switchTab(event, paneId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.ribbon-pane').forEach(p => p.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(paneId).classList.add('active');
+        }
+
+        function updateWordCount() {
+            const text = document.getElementById('editor').innerText.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            document.getElementById('wordCount').innerText = `${words} words`;
+        }
+
+        function changeMargin(size) {
+            document.getElementById('editor').style.padding = size;
+        }
+        
+        const gridContainer = document.querySelector('.grid-container');
+        for (let r = 1; r <= 5; r++) {
+            for (let c = 1; c <= 5; c++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.dataset.row = r;
+                cell.dataset.col = c;
+                cell.onmouseover = () => highlightGrid(r, c);
+                cell.onclick = () => generateTable(r, c);
+                gridContainer.appendChild(cell);
+            }
+        }
+
+        function toggleTableDropdown(e) {
+            e.stopPropagation();
+            const menu = document.getElementById('tableMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function highlightGrid(maxRow, maxCol) {
+            document.getElementById('gridLabel').innerText = `${maxCol} x ${maxRow} Table`;
+            document.querySelectorAll('.grid-cell').forEach(cell => {
+                const r = parseInt(cell.dataset.row);
+                const c = parseInt(cell.dataset.col);
+                if (r <= maxRow && c <= maxCol) {
+                    cell.classList.add('highlighted');
+                } else {
+                    cell.classList.remove('highlighted');
+                }
+            });
+        }
+
+        function clearGridHighlight() {
+            document.getElementById('gridLabel').innerText = "Insert Table";
+            document.querySelectorAll('.grid-cell').forEach(cell => cell.classList.remove('highlighted'));
+        }
+
+        function generateTable(rows, cols) {
+            let tableHtml = '<table>';
+            for (let i = 0; i < rows; i++) {
+                tableHtml += '<tr>';
+                for (let j = 0; j < cols; j++) {
+                    tableHtml += '<td><br></td>';
+                }
+                tableHtml += '</tr>';
+            }
+            tableHtml += '</table><p><br></p>';
+            format('insertHTML', tableHtml);
+        }
+
+        function insertImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgHtml = `<img src="${e.target.result}" alt="Uploaded Image" />`;
+                    format('insertHTML', imgHtml);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        window.onclick = function() {
+            document.getElementById('tableMenu').style.display = 'none';
+        }
+        
+        updateWordCount();
+    </script>
+</body>
+</html>
