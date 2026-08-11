@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document1 - Microsoft Word Online</title>
+    <title>Document1 - Bobsoft Web Editor</title>
     <style>
         :root {
             --word-blue: #185abd;
@@ -331,6 +331,17 @@
     </div>
 
     <script>
+        function welcome() {
+            alert('Welcome to Bobsoft Web Editor')
+            new = prompt('Are you new?')
+            if ( new == 'yes') {
+                alert('Welcome To BobNet!')
+                alert('Now proceeding to our home page!')
+                window.location = 'https://www.itdude207.github.io/bob'
+                
+            }
+            
+        }
         function format(command, value = null) {
             document.execCommand(command, false, value);
             document.getElementById('editor').focus();
