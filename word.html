@@ -332,15 +332,15 @@
 
     <script>
         function welcome() {
-            alert('Welcome to Bobsoft Web Editor');
-            new = prompt('Are you new?');
-            if ( new == 'yes') {
-                alert('Welcome To BobNet!');
-                alert('Now proceeding to our home page!');
-                window.location = 'https://www.itdude207.github.io/bob';
-                
-            }
-            
+    alert('Welcome to Bobsoft Web Editor');
+    let isNew = prompt('Are you new?');
+    if (isNew == 'yes') {
+        alert('Welcome To BobNet!');
+        alert('Now proceeding to our home page!');
+        window.location = 'https://www.itdude207.github.io/bob';
+    }
+}
+
         }
         function format(command, value = null) {
             document.execCommand(command, false, value);
