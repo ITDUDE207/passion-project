@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub Pages JavaScript Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; line-height: 1.6; }
+        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background: #f9f9f9; }
+        .success { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>What Can JavaScript Do? A Static Pages Demo</h1>
+
+    <!-- 1. DYNAMIC CONTENT GENERATION -->
+    <div class="box">
+        <h2>1. Dynamic Content Generation</h2>
+        <p>JavaScript reads the user's environment data and updates pages in real-time.</p>
+        <p><strong>Current Browser Time:</strong> <span id="browser-time"></span></p>
+        <p><strong>Your Browser/User Agent:</strong> <span id="user-agent"></span></p>
+    </div>
+
+    <!-- 2. CONDITIONAL LOGIC & MATH -->
+    <div class="box">
+        <h2>2. Conditional Logic & Math</h2>
+        <p><strong>Greeting based on time:</strong> <span id="greeting"></span></p>
+        <p><strong>Browser-side Math:</strong> <span id="math-result"></span></p>
+    </div>
+
+    <!-- 3. FORM HANDLING & SECURITY -->
+    <div class="box">
+        <h2>3. Interactive Form Handling & Sanitization</h2>
+        <p>JavaScript can intercept data sent by users, filter it, and display a tailored message instantly.</p>
+        
+        <div id="form-response"></div>
+
+        <form id="demo-form">
+            <label for="username">Enter your name:</label>
+            <input type="text" id="username" required>
+            <input type="submit" value="Submit to JS">
+        </form>
+    </div>
+
+    <!-- 4. LOOPS AND DATA STRUCTURES -->
+    <div class="box">
+        <h2>4. Loops & Array Rendering</h2>
+        <p>JavaScript handles array data loops to construct HTML components automatically.</p>
+        <ul id="skills-list"></ul>
+    </div>
+
+    <script>
+        // 1. Dynamic Content & Environment
+        document.getElementById('browser-time').innerText = new Date().toLocaleString();
+        document.getElementById('user-agent').innerText = navigator.userAgent;
+
+        // 2. Conditional Logic & Math
+        const hour = new Date().getHours();
+        let greeting = "Good evening!";
+        if (hour < 12) greeting = "Good morning!";
+        else if (hour < 18) greeting = "Good afternoon!";
+        document.getElementById('greeting').innerText = greeting;
+
+        const num1 = 15;
+        const num2 = 27;
+        document.getElementById('math-result').innerText = `${num1} + ${num2} = ${num1 + num2}`;
+
+        // 3. Form Handling (No server reload needed)
+        document.getElementById('demo-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const rawInput = document.getElementById('username').value;
+            
+            // Basic text escaping to mimic sanitization
+            const cleanInput = rawInput.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            document.getElementById('form-response').innerHTML = 
+                `<p class='success'>Hello, ${cleanInput}! JavaScript safely processed this input in your browser.</p>`;
+        });
+
+        // 4. Loops & Array Rendering
+        const skills = ["Form Interception", "Client-side Storage", "DOM Manipulation", "API Consumption"];
+        const listContainer = document.getElementById('skills-list');
+        skills.forEach(skill => {
+            const li = document.createElement('li');
+            li.innerText = `Capable of: ${skill}`;
+            listContainer.appendChild(li);
+        });
+    </script>
+
+</body>
+</html>
