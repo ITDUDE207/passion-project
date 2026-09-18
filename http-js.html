@@ -1,0 +1,965 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTTP Playground</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0f1115;
+        color: #f1f3f5;
+    }
+
+    header {
+        padding: 22px 30px;
+        border-bottom: 1px solid #292d35;
+        background: #15181e;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 26px;
+    }
+
+    header p {
+        margin: 5px 0 0;
+        color: #9299a5;
+    }
+
+    main {
+        max-width: 1200px;
+        margin: auto;
+        padding: 25px;
+    }
+
+    .request-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    select,
+    input,
+    textarea,
+    button {
+        font: inherit;
+    }
+
+    select,
+    input,
+    textarea {
+        background: #191c23;
+        color: #f1f3f5;
+        border: 1px solid #343944;
+        border-radius: 7px;
+        outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: #6ea8fe;
+    }
+
+    #method {
+        width: 120px;
+        padding: 12px;
+        font-weight: bold;
+    }
+
+    #url {
+        flex: 1;
+        padding: 12px;
+    }
+
+    button {
+        border: 0;
+        border-radius: 7px;
+        padding: 12px 20px;
+        cursor: pointer;
+        background: #4c8bf5;
+        color: white;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: #3b78df;
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .panel {
+        background: #15181e;
+        border: 1px solid #292d35;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .panel-title {
+        padding: 14px 17px;
+        border-bottom: 1px solid #292d35;
+        font-weight: bold;
+    }
+
+    .panel-content {
+        padding: 17px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 7px;
+        color: #aab1bd;
+        font-size: 14px;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 180px;
+        resize: vertical;
+        padding: 12px;
+        font-family: monospace;
+        line-height: 1.5;
+    }
+
+    .headers {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .header-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .header-row input {
+        flex: 1;
+        padding: 9px;
+    }
+
+    .remove {
+        background: #292d35;
+        padding: 8px 12px;
+    }
+
+    .remove:hover {
+        background: #3a3f49;
+    }
+
+    .add-header {
+        margin-top: 10px;
+        background: #292d35;
+    }
+
+    .add-header:hover {
+        background: #383e49;
+    }
+
+    .response {
+        margin-top: 20px;
+    }
+
+    .response-info {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .status {
+        padding: 6px 10px;
+        border-radius: 6px;
+        background: #292d35;
+        font-weight: bold;
+    }
+
+    .status.success {
+        background: #174d2d;
+        color: #76e39b;
+    }
+
+    .status.error {
+        background: #5b2020;
+        color: #ff9999;
+    }
+
+    .status.info {
+        background: #193b5c;
+        color: #8cc8ff;
+    }
+
+    .response-box {
+        margin-top: 15px;
+    }
+
+    .response-box textarea {
+        min-height: 350px;
+        white-space: pre;
+        overflow: auto;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    .tab {
+        padding: 8px 13px;
+        background: #292d35;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #b9c0ca;
+    }
+
+    .tab.active {
+        background: #4c8bf5;
+        color: white;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .history {
+        margin-top: 20px;
+    }
+
+    .history-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px;
+        border-bottom: 1px solid #292d35;
+        cursor: pointer;
+    }
+
+    .history-item:hover {
+        background: #1d2129;
+    }
+
+    .history-method {
+        font-weight: bold;
+        width: 70px;
+    }
+
+    .history-url {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #aeb5c0;
+    }
+
+    .empty {
+        color: #777f8c;
+        padding: 10px 0;
+    }
+
+    @media (max-width: 800px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+
+        .request-bar {
+            flex-direction: column;
+        }
+
+        #method {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌐 HTTP Playground</h1>
+    <p>Experiment with HTTP requests directly from your browser.</p>
+</header>
+
+<main>
+
+    <!-- REQUEST BAR -->
+    <div class="request-bar">
+
+        <select id="method">
+            <option>GET</option>
+            <option>POST</option>
+            <option>PUT</option>
+            <option>PATCH</option>
+            <option>DELETE</option>
+            <option>HEAD</option>
+            <option>OPTIONS</option>
+        </select>
+
+        <input
+            id="url"
+            type="text"
+            placeholder="https://api.github.com"
+            value="https://api.github.com"
+        >
+
+        <button id="sendButton" onclick="sendRequest()">
+            SEND
+        </button>
+
+    </div>
+
+
+    <div class="grid">
+
+        <!-- REQUEST -->
+        <div class="panel">
+
+            <div class="panel-title">
+                Request
+            </div>
+
+            <div class="panel-content">
+
+                <div class="tabs">
+                    <div class="tab active" onclick="showTab('headers')">
+                        Headers
+                    </div>
+
+                    <div class="tab" onclick="showTab('body')">
+                        Body
+                    </div>
+                </div>
+
+
+                <!-- HEADERS -->
+                <div id="headersTab">
+
+                    <label>HTTP Headers</label>
+
+                    <div id="headers" class="headers">
+
+                        <div class="header-row">
+                            <input
+                                class="header-name"
+                                placeholder="Header name"
+                            >
+
+                            <input
+                                class="header-value"
+                                placeholder="Value"
+                            >
+
+                            <button
+                                class="remove"
+                                onclick="removeHeader(this)"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <button
+                        class="add-header"
+                        onclick="addHeader()"
+                    >
+                        + Add Header
+                    </button>
+
+                </div>
+
+
+                <!-- BODY -->
+                <div id="bodyTab" class="hidden">
+
+                    <label>Request Body</label>
+
+                    <textarea
+                        id="requestBody"
+                        placeholder='{
+    "hello": "world"
+}'></textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RESPONSE -->
+        <div class="panel">
+
+            <div class="panel-title">
+                Response
+            </div>
+
+            <div class="panel-content">
+
+                <div class="response-info">
+
+                    <span
+                        id="status"
+                        class="status info"
+                    >
+                        No request yet
+                    </span>
+
+                    <span id="responseTime">
+                        —
+                    </span>
+
+                    <span id="responseSize">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="response-box">
+
+                    <label>Response Body</label>
+
+                    <textarea
+                        id="responseBody"
+                        readonly
+                        placeholder="The response will appear here..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESPONSE HEADERS -->
+    <div class="panel response">
+
+        <div class="panel-title">
+            Response Headers
+        </div>
+
+        <div class="panel-content">
+
+            <textarea
+                id="responseHeaders"
+                readonly
+                placeholder="Response headers will appear here..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- HISTORY -->
+    <div class="panel history">
+
+        <div class="panel-title">
+            Request History
+        </div>
+
+        <div class="panel-content">
+
+            <div id="history">
+                <div class="empty">
+                    No requests yet.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+let requestHistory = [];
+
+
+/* -------------------------
+   TABS
+------------------------- */
+
+function showTab(tab) {
+
+    const headersTab =
+        document.getElementById("headersTab");
+
+    const bodyTab =
+        document.getElementById("bodyTab");
+
+    const tabs =
+        document.querySelectorAll(".tab");
+
+    if (tab === "headers") {
+
+        headersTab.classList.remove("hidden");
+        bodyTab.classList.add("hidden");
+
+        tabs[0].classList.add("active");
+        tabs[1].classList.remove("active");
+
+    } else {
+
+        headersTab.classList.add("hidden");
+        bodyTab.classList.remove("hidden");
+
+        tabs[0].classList.remove("active");
+        tabs[1].classList.add("active");
+
+    }
+
+}
+
+
+/* -------------------------
+   HEADER MANAGEMENT
+------------------------- */
+
+function addHeader() {
+
+    const container =
+        document.getElementById("headers");
+
+    const row =
+        document.createElement("div");
+
+    row.className = "header-row";
+
+    row.innerHTML = `
+        <input
+            class="header-name"
+            placeholder="Header name"
+        >
+
+        <input
+            class="header-value"
+            placeholder="Value"
+        >
+
+        <button
+            class="remove"
+            onclick="removeHeader(this)"
+        >
+            ×
+        </button>
+    `;
+
+    container.appendChild(row);
+
+}
+
+
+function removeHeader(button) {
+
+    const rows =
+        document.querySelectorAll(".header-row");
+
+    if (rows.length <= 1) {
+        return;
+    }
+
+    button.parentElement.remove();
+
+}
+
+
+/* -------------------------
+   SEND REQUEST
+------------------------- */
+
+async function sendRequest() {
+
+    const url =
+        document.getElementById("url").value.trim();
+
+    const method =
+        document.getElementById("method").value;
+
+    const button =
+        document.getElementById("sendButton");
+
+    const responseBody =
+        document.getElementById("responseBody");
+
+    const responseHeaders =
+        document.getElementById("responseHeaders");
+
+    const status =
+        document.getElementById("status");
+
+    const responseTime =
+        document.getElementById("responseTime");
+
+    const responseSize =
+        document.getElementById("responseSize");
+
+
+    if (!url) {
+
+        alert("Enter a URL first.");
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+    button.textContent = "SENDING...";
+
+
+    status.className = "status info";
+    status.textContent = "Sending request...";
+
+    responseBody.value = "";
+    responseHeaders.value = "";
+
+    responseTime.textContent = "—";
+    responseSize.textContent = "—";
+
+
+    /* -------------------------
+       BUILD HEADERS
+    ------------------------- */
+
+    const headers = {};
+
+    const names =
+        document.querySelectorAll(".header-name");
+
+    const values =
+        document.querySelectorAll(".header-value");
+
+
+    for (let i = 0; i < names.length; i++) {
+
+        const name =
+            names[i].value.trim();
+
+        const value =
+            values[i].value.trim();
+
+        if (name) {
+            headers[name] = value;
+        }
+
+    }
+
+
+    /* -------------------------
+       REQUEST OPTIONS
+    ------------------------- */
+
+    const options = {
+        method: method,
+        headers: headers
+    };
+
+
+    const body =
+        document.getElementById("requestBody").value;
+
+
+    if (
+        body &&
+        method !== "GET" &&
+        method !== "HEAD"
+    ) {
+
+        options.body = body;
+
+    }
+
+
+    try {
+
+        const start =
+            performance.now();
+
+
+        const response =
+            await fetch(url, options);
+
+
+        const end =
+            performance.now();
+
+
+        /* -------------------------
+           STATUS
+        ------------------------- */
+
+        status.textContent =
+            `${response.status} ${response.statusText}`;
+
+
+        if (response.ok) {
+
+            status.className =
+                "status success";
+
+        } else {
+
+            status.className =
+                "status error";
+
+        }
+
+
+        responseTime.textContent =
+            `${Math.round(end - start)} ms`;
+
+
+        /* -------------------------
+           RESPONSE HEADERS
+        ------------------------- */
+
+        let headerText = "";
+
+        response.headers.forEach(
+            (value, key) => {
+
+                headerText +=
+                    `${key}: ${value}\n`;
+
+            }
+        );
+
+        responseHeaders.value =
+            headerText || "(No readable headers)";
+
+
+        /* -------------------------
+           RESPONSE BODY
+        ------------------------- */
+
+        const text =
+            await response.text();
+
+
+        let formatted =
+            text;
+
+
+        /*
+         * Try to format JSON automatically.
+         */
+
+        try {
+
+            const json =
+                JSON.parse(text);
+
+            formatted =
+                JSON.stringify(
+                    json,
+                    null,
+                    2
+                );
+
+        } catch {
+
+            // Not JSON — leave it alone.
+
+        }
+
+
+        responseBody.value =
+            formatted;
+
+
+        responseSize.textContent =
+            `${new Blob([text]).size} bytes`;
+
+
+        /* -------------------------
+           HISTORY
+        ------------------------- */
+
+        addHistory(
+            method,
+            url
+        );
+
+
+    } catch (error) {
+
+        status.className =
+            "status error";
+
+        status.textContent =
+            "Request failed";
+
+        responseBody.value =
+            `ERROR:\n\n${error.message}\n\n` +
+            `This can happen because of CORS, ` +
+            `an invalid URL, network problems, ` +
+            `or the server refusing the request.`;
+
+        responseHeaders.value = "";
+
+        responseTime.textContent = "—";
+        responseSize.textContent = "—";
+
+    }
+
+
+    button.disabled = false;
+    button.textContent = "SEND";
+
+}
+
+
+/* -------------------------
+   HISTORY
+------------------------- */
+
+function addHistory(method, url) {
+
+    requestHistory.unshift({
+        method: method,
+        url: url
+    });
+
+
+    if (requestHistory.length > 10) {
+
+        requestHistory =
+            requestHistory.slice(0, 10);
+
+    }
+
+
+    renderHistory();
+
+}
+
+
+function renderHistory() {
+
+    const container =
+        document.getElementById("history");
+
+
+    if (requestHistory.length === 0) {
+
+        container.innerHTML =
+            '<div class="empty">No requests yet.</div>';
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    requestHistory.forEach(
+        (request, index) => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "history-item";
+
+
+            item.innerHTML = `
+                <span class="history-method">
+                    ${request.method}
+                </span>
+
+                <span class="history-url">
+                    ${escapeHTML(request.url)}
+                </span>
+            `;
+
+
+            item.onclick = () => {
+
+                document.getElementById("method")
+                    .value = request.method;
+
+                document.getElementById("url")
+                    .value = request.url;
+
+            };
+
+
+            container.appendChild(item);
+
+        }
+    );
+
+}
+
+
+/* -------------------------
+   HTML ESCAPING
+------------------------- */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+
+/* -------------------------
+   KEYBOARD SHORTCUT
+------------------------- */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        /*
+         * Ctrl + Enter
+         * or
+         * Cmd + Enter
+         */
+
+        if (
+            (event.ctrlKey || event.metaKey) &&
+            event.key === "Enter"
+        ) {
+
+            sendRequest();
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
+
